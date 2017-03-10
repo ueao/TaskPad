@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Memo Pad</title>
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- modalwindow -->
+  <style media="screen">
+    .modal {
+        display: none;
+        position: absolute;
+        top: 0px;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: hsla(33, 90%, 8%, 0.83);
+        text-align: center;
+    }
+    .modal-content {
+        width: 100%;
+        height: 100%;
+        margin: 0 ;
+        padding: 0px;
+        left: 50%;
+        top: 50%;
+    }
+    /*ドラッグで動いてほしいメモ*/
+    .stickey-memo {
+      width: 100px;
+      height: 100px;
+      padding: 10px 10px;
+      margin: 10px 10px;
+      background-color: hsla(23, 62%, 15%, 0.50);
+      border: 4px solid hsla(0, 0%, 100%, 0.59);
+      border-radius: 6px;
+      color:#fff;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    /*<!-- /modalwindow -->*/</style>
+</head>
+
+<body>
+  <div class="wrapper">
+  <!-- memoView -->
+  <div id="button-area">
+    <div class="btns">
+      <button type="button" name="button1" id="add-memo">Add Memo</button>
+      <button type="button" name="button2" id="del-memo">Complete!</button>
+    </div>
+  <!-- /memoView --></div>
+
+  <!-- メモを貼り付けるスペース -->
+  <div id="output-memo"></div>
+
+  <!-- modalView -->
+  <div class="modal">
+    <div class="modal-content">
+      <p id="modal-title">What is your main forcus for today?</p>
+      <textarea placeholder="ここに今日のToDoを入力" id="input-memo" rows="20" cols="60" name="40"></textarea><br>
+      <button type="button" name="button" id="ok-memo">OK!</button>
+    </div>
+  <!-- /modal --></div>
+
+  <!-- jquery使うよ設定 -->
+  <script src="https://code.jquery.com/jquery-3.0.0.min.js" charset="utf-8"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script type="text/javascript">
+
+  // ローカルストレージからデータを取得
+  var data = window.localStorage.getItem("memo");
+  var memoArray = [];
+  if(data !== null){
+      // console.log(data);
+      // JSON文字列 => 配列に変換
+      var array = JSON.parse(data);
+      // console.log(array);
+      for(var i=0; i<array.length; i++){
+          // 出力
+          $("#stickey-memo").append('<p>' + array[i] + '</p>');
+          // 既存のデータを配列に設定する
+          memoArray.push(array[i]);
+      }
+  }
+
+  // メモを書くボタンをおすとmodalが出てくる
+  //　----メモを書くボタンの処理----------
+    $("#add-memo").on("click", function() {
+      $(".modal").fadeIn(200);
+      console.log("メモ書くよ");
+    });
+
+    // 完了ボタンをおす
+    // メモを保存
+    // modal戻る
+    // 付箋を生成して表示
+    //　-----完了ボタンの処理---------
+    $("#ok-memo").on("click", function () {
+      var val = $("#input-memo").val();
+
+      // <div class = stickey-memo>
+        //     <p>xxxxxxx</p>
+      // </div>
+
+      // 配列の中に保存する
+      memoArray.push(val);
+
+      // 配列の中身をJSON文字列に変換
+      var json = JSON.stringify(memoArray);
+
+      // 鍵つけて格納
+      window.localStorage.setItem("memo", json);
+
+      // 出力
+      // .draggable()でドラッグ可能に
+      // var stickey= $(".stickey-memo");
+      // stickey.text(val);
+      // $(".stickey-memo").appendTo("#output-memo").draggable();
+
+      var $stickeyMemo = $('<div class="stickey-memo"></div>');
+      $stickeyMemo.appendTo("#output-memo").draggable();
+
+      console.log(memoArray);
+      console.log(val);
+      $stickeyMemo.append("<p　>" + val + "</P>");
+      // var divS = $("div");
+      // $(".stickey-memo").append(divS);
+
+      // もだるもどる
+      $(".modal").fadeOut(260);
+      // $("#output-memo").append("<p>" + data + "</P>");
+      console.log("データ取得したよ");
+      $("#input-memo").val("");
+      return val;
+    });
+
+    $('.modal').on('click', function(evt){
+        $(this).fadeOut(200);
+    });
+
+    // クリックしたときにモーダルウィンドウを閉じないようにする
+    $(".modal-content").on("click", function(evt){
+        // イベントをmodal要素まで伝えない
+        evt.stopPropagation();
+    });
+
+
+
+    // 消すボタンをおすと配列からデータを消す
+    $("#del-memo").on("click", function () {
+      console.log("メモ消すよ");
+      $(".stickey-memo").remove();
+      window.localStorage.removeItem("memo");
+      // memoArrayをからにする
+
+      console.log(memoArray);
+    });
+
+
+
+
+  </script>
+  <!-- /wrapper --></div>
+</body>
+</html>
